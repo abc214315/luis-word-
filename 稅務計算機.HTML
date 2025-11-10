@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海沃稅務計算工具 2024 - HAIWO Tax Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0D3B5C;
+            --secondary-orange: #C17A47;
+            --light-beige: #E8DCC8;
+            --white: #FFFFFF;
+            --gray: #666666;
+            --light-gray: #F8F9FA;
+            --border: #E0E0E0;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            background: linear-gradient(135deg, var(--light-beige) 0%, #FFFFFF 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(10, 46, 77, 0.1);
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--secondary-orange) 100%);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .logo-section img {
+            height: 80px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-size: 48px;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-orange) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 5px;
+        }
+
+        .header h1 {
+            color: var(--primary-blue);
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: var(--gray);
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: var(--secondary-orange);
+            color: var(--white);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        /* Input Section */
+        .input-section {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(10, 46, 77, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: var(--primary-blue);
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--secondary-orange);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            color: var(--primary-blue);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: var(--white);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--secondary-orange);
+            box-shadow: 0 0 0 3px rgba(193, 127, 71, 0.1);
+        }
+
+        .form-group input[readonly] {
+            background: var(--light-gray);
+            cursor: not-allowed;
+        }
+
+        .subsection {
+            background: var(--light-gray);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--secondary-orange);
+        }
+
+        .subsection-title {
+            color: var(--primary-blue);
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Tooltip */
+        .info-tooltip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: var(--secondary-orange);
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+        }
+
+        .tooltip-content {
+            display: none;
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-blue);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            white-space: nowrap;
+            font-size: 13px;
+            font-weight: normal;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .tooltip-content::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--primary-blue);
+        }
+
+        .info-tooltip.active .tooltip-content {
+            display: block;
+        }
+
+        /* Alert Box */
+        .alert-box {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-left: 4px solid var(--warning);
+            color: #856404;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+        }
+
+        /* Number Input with Unit */
+        .input-with-unit {
+            position: relative;
+        }
+
+        .input-with-unit input {
+            padding-right: 50px;
+        }
+
+        .input-unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        /* Calculate Button */
+        .calculate-btn {
+            background: linear-gradient(135deg, var(--secondary-orange) 0%, #D4915E 100%);
+            color: var(--white);
+            padding: 20px 60px;
+            border: none;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: block;
+            margin: 40px auto;
+            box-shadow: 0 8px 25px rgba(193, 127, 71, 0.3);
+            transition: all 0.3s;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(193, 127, 71, 0.4);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .result-card {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(10, 46, 77, 0.1);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--secondary-orange) 100%);
+        }
+
+        /* 結論摘要卡片 */
+        .conclusion-box {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #0d3d66 100%);
+            color: var(--white);
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(10, 46, 77, 0.3);
+        }
+
+        .conclusion-box h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .conclusion-box .highlight {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--secondary-orange);
+            margin: 15px 0;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .result-title {
+            color: var(--primary-blue);
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-badge {
+            background: var(--secondary-orange);
+            color: var(--white);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .result-table th,
+        .result-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .result-table th {
+            background: var(--light-gray);
+            color: var(--primary-blue);
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .result-table tr:hover {
+            background: var(--light-beige);
+            transition: all 0.2s;
+        }
+
+        .highlight-number {
+            color: var(--secondary-orange);
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .total-row {
+            background: var(--primary-blue) !important;
+            color: var(--white) !important;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .total-row td {
+            border: none;
+        }
+
+        .subtotal-row {
+            background: rgba(193, 127, 71, 0.1) !important;
+            font-weight: 600;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            margin: 30px 0;
+            padding: 30px;
+            background: var(--light-gray);
+            border-radius: 15px;
+        }
+
+        .chart-title {
+            color: var(--primary-blue);
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .bar-label {
+            min-width: 180px;
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        .bar-wrapper {
+            flex: 1;
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            height: 40px;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary-orange) 0%, #D4915E 100%);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            color: var(--white);
+            font-weight: bold;
+            transition: width 1s ease-out;
+        }
+
+        .bar-fill.company {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, #0d3d66 100%);
+        }
+
+        .bar-fill.sole {
+            background: linear-gradient(90deg, var(--success) 0%, #34ce57 100%);
+        }
+
+        /* Comparison Section */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .comparison-card {
+            background: linear-gradient(135deg, var(--light-gray) 0%, var(--white) 100%);
+            padding: 30px;
+            border-radius: 20px;
+            border: 3px solid var(--border);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .comparison-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(10, 46, 77, 0.15);
+        }
+
+        .comparison-card.recommended {
+            border: 3px solid var(--secondary-orange);
+            background: linear-gradient(135deg, #FFF8F0 0%, var(--white) 100%);
+            box-shadow: 0 8px 25px rgba(193, 127, 71, 0.2);
+        }
+
+        .comparison-card.recommended::before {
+            content: '⭐ 建議選擇';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--secondary-orange);
+            color: var(--white);
+            padding: 8px 25px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(193, 127, 71, 0.3);
+        }
+
+        .comparison-title {
+            color: var(--primary-blue);
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .comparison-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px dashed var(--border);
+            align-items: center;
+        }
+
+        .comparison-item:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-item span {
+            color: var(--gray);
+            font-size: 15px;
+        }
+
+        .comparison-item strong {
+            color: var(--primary-blue);
+            font-size: 16px;
+            text-align: right;
+        }
+
+        .comparison-highlight {
+            background: var(--light-beige);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 12px;
+            border-left: 4px solid var(--secondary-orange);
+        }
+
+        .comparison-highlight .label {
+            font-weight: bold;
+            color: var(--primary-blue);
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .comparison-highlight .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--secondary-orange);
+            text-align: right;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #0d3d66 100%);
+            color: var(--white);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(10, 46, 77, 0.3);
+        }
+
+        .cta-section h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .cta-section p {
+            font-size: 16px;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+
+        .cta-btn {
+            background: var(--secondary-orange);
+            color: var(--white);
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .cta-btn:hover {
+            background: #D4915E;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(193, 127, 71, 0.4);
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            background: var(--light-gray);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border: 2px dashed var(--border);
+            text-align: center;
+        }
+
+        .disclaimer h4 {
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .disclaimer p {
+            color: var(--gray);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-print {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .btn-print:hover {
+            background: #0d3d66;
+            transform: translateY(-2px);
+        }
+
+        .btn-reset {
+            background: var(--white);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+
+        .btn-reset:hover {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid var(--light-gray);
+            border-top: 4px solid var(--secondary-orange);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Tax Method Badge */
+        .tax-method-badge {
+            display: inline-block;
+            background: var(--success);
+            color: var(--white);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .input-section, .result-card {
+                padding: 25px;
+            }
+
+            .logo-section {
+                flex-direction: column;
+            }
+
+            .logo-section img {
+                height: 60px;
+            }
+
+            .logo-text {
+                font-size: 36px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .bar-label {
+                min-width: 120px;
+                font-size: 13px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body { 
+                background: white; 
+                padding: 0;
+            }
+            .input-section, .action-buttons, .cta-section { 
+                display: none; 
+            }
+            .result-card { 
+                page-break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid var(--border);
+            }
+            .header {
+                box-shadow: none;
+                border: 1px solid var(--border);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-section">
+                <img src="Logo.png" alt="HAIWO Logo" onerror="this.style.display='none'">
+            </div>
+            <h1>台灣稅務智能計算工具</h1>
+            <p>精準試算 · 智慧分析 · 專業建議</p>
+            <span class="version-badge">2024年版（2025年5月申報適用）</span>
+        </div>
+
+        <!-- Input Section -->
+        <div class="input-section" id="inputSection">
+            <h2 class="section-title">📊 基本資料輸入</h2>
+            
+            <!-- 營業資料 -->
+            <div class="subsection">
+                <h3 class="subsection-title">🏢 營業基本資料</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>
+                            預估總營業收入（年度）
+                            <span class="info-tooltip">?<span class="tooltip-content">請輸入公司或行號的年度總營業收入</span></span>
+                        </label>
+                        <div class="input-with-unit">
+                            <input type="text" id="revenue" placeholder="請輸入年度總營收" value="10,000,000">
+                            <span class="input-unit">元</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>行業別</label>
+                        <input type="text" id="industry" placeholder="例如：酵母製造" value="">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            擴大書審純益率（%）
+                            <span class="info-tooltip">?<span class="tooltip-content">依國稅局核定標準（營收超過3000萬不適用）</span></span>
+                        </label>
+                        <input type="text" id="profitRate" placeholder="例如：6" value="6">
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>
+                            所得額標準（%）
+                            <span class="info-tooltip">?<span class="tooltip-content">同業利潤標準</span></span>
+                        </label>
+                        <input type="text" id="incomeStandard" placeholder="例如：9" value="9">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            淨利率（%）
+                            <span class="info-tooltip">?<span class="tooltip-content">同業利潤標準</span></span>
+                        </label>
+                        <input type="text" id="netProfitRate" placeholder="例如：11" value="11">
+                    </div>
+                </div>
+
+                <div id="revenueWarning" class="alert-box alert-warning" style="display: none;">
+                    <strong>⚠️ 注意：</strong>營收超過3000萬元，無法使用擴大書審純益率，系統將自動排除此計算方式。
+                </div>
+            </div>
+
+            <!-- 個人綜所資料 -->
+            <div class="subsection">
+                <h3 class="subsection-title">👤 老闆個人綜合所得資料</h3>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>持股比例（%）</label>
+                        <input type="number" id="shareholdingRatio" placeholder="例如：100" min="0" max="100" step="0.01" value="100">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            盈餘分配來源
+                            <span class="info-tooltip">?
+                                <span class="tooltip-content">
+                                    選擇要從哪一種計算方式的稅後淨利來分配盈餘
+                                </span>
+                            </span>
+                        </label>
+                        <select id="profitSource">
+                            <option value="optimal">使用最優方式（系統自動選擇）</option>
+                            <option value="bookAudit">使用擴大書審純益率</option>
+                            <option value="standard">使用所得額標準</option>
+                            <option value="netProfit">使用淨利率</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>
+                            盈餘分配比例（%）
+                            <span class="info-tooltip">?
+                                <span class="tooltip-content">
+                                    預計分配給股東的比例（0-100%）<br>
+                                    • 100%：全部分配<br>
+                                    • 50%：保留一半用於再投資<br>
+                                    • 未分配盈餘可能需加徵5%營所稅
+                                </span>
+                            </span>
+                        </label>
+                        <input type="number" id="distributionRatio" placeholder="預設100%" value="100" min="0" max="100" step="1">
+                        <small style="color: #666; font-size: 0.85em; display: block; margin-top: 5px;">
+                            建議：新創公司50-70%，成熟公司80-100%
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>婚姻狀況</label>
+                        <select id="maritalStatus">
+                            <option value="single">單身</option>
+                            <option value="married">已婚</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>
+                            薪資所得
+                            <span class="info-tooltip">?<span class="tooltip-content">年度薪資收入（包含公司發放的薪資）</span></span>
+                        </label>
+                        <div class="input-with-unit">
+                            <input type="text" id="salary" placeholder="請輸入薪資所得" value="0">
+                            <span class="input-unit">元</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            子女人數
+                            <span class="info-tooltip">?<span class="tooltip-content">未滿20歲或20歲以上在校就學、身心障礙或無謀生能力</span></span>
+                        </label>
+                        <input type="number" id="children" placeholder="請輸入子女人數" value="0" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculate Button -->
+            <button class="calculate-btn" id="calculateBtn">
+                🧮 開始計算稅務
+            </button>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 15px; color: var(--gray);">計算中，請稍候...</p>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <!-- 結論摘要 -->
+            <div class="conclusion-box" id="conclusionBox">
+            </div>
+
+            <!-- 總稅負比較圖表 -->
+            <div class="result-card">
+                <div class="result-header">
+                    <h2 class="result-title">⚖️ 公司制 vs 行號制 總稅負比較</h2>
+                    <span class="result-badge">核心結論</span>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">總稅負比較（含所有稅費）</div>
+                    <div class="bar-chart" id="totalTaxComparisonChart">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 計算方式說明 -->
+            <div class="result-card">
+                <div class="alert-box alert-info" id="calculationMethodInfo">
+                    <div>
+                        <strong>📋 課稅所得額計算方式</strong>
+                        <p id="methodDescription" style="margin-top: 10px;"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 三種計算方式比較 -->
+            <div class="result-card">
+                <div class="result-header">
+                    <h2 class="result-title">📊 課稅所得額計算方式比較</h2>
+                    <span class="result-badge">智能試算</span>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">營所稅比較圖表</div>
+                    <div class="bar-chart" id="comparisonChart">
+                    </div>
+                </div>
+
+                <table class="result-table">
+                    <thead>
+                        <tr>
+                            <th>計算方式</th>
+                            <th style="text-align: right;">課稅所得額</th>
+                            <th style="text-align: right;">營所稅（20%）</th>
+                            <th style="text-align: right;">稅後淨利</th>
+                            <th>說明</th>
+                        </tr>
+                    </thead>
+                    <tbody id="comparisonTable">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 個人綜所試算 -->
+            <div class="result-card">
+                <div class="result-header">
+                    <h2 class="result-title">👤 老闆個人綜合所得稅試算</h2>
+                    <span class="result-badge">個人稅負</span>
+                </div>
+                
+                <h3 style="color: var(--primary-blue); margin: 25px 0 20px 0; font-size: 20px; display: flex; align-items: center; gap: 10px;">
+                    🏢 情境A：公司制（股利所得）
+                    <span id="dividendMethodBadge" class="tax-method-badge"></span>
+                </h3>
+                <table class="result-table">
+                    <thead>
+                        <tr>
+                            <th>項目</th>
+                            <th style="text-align: right;">金額</th>
+                            <th>說明</th>
+                        </tr>
+                    </thead>
+                    <tbody id="personalTaxCompanyTable">
+                    </tbody>
+                </table>
+
+                <h3 style="color: var(--primary-blue); margin: 40px 0 20px 0; font-size: 20px; display: flex; align-items: center; gap: 10px;">
+                    🏪 情境B：行號制（營利所得）
+                </h3>
+                <table class="result-table">
+                    <thead>
+                        <tr>
+                            <th>項目</th>
+                            <th style="text-align: right;">金額</th>
+                            <th>說明</th>
+                        </tr>
+                    </thead>
+                    <tbody id="personalTaxSoleTable">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 公司 vs 行號比較 -->
+            <div class="result-card">
+                <div class="result-header">
+                    <h2 class="result-title">📑 公司 vs 行號 詳細分析</h2>
+                    <span class="result-badge">完整比較</span>
+                </div>
+                
+                <div class="comparison-grid" id="comparisonGrid">
+                </div>
+
+                <!-- CTA -->
+                <div class="cta-section">
+    <h3>💡 需要更深入的個人化稅務規劃？</h3>
+    <p>海沃財富管理團隊提供專業稅務諮詢服務，為您量身打造最佳節稅方案</p>
+    <a href="https://maac.io/4DHyp" target="_blank" class="cta-btn">立即預約專業顧問</a>
+</div>
+
+<!-- Action Buttons -->
+<div class="action-buttons">
+    <button class="action-btn btn-reset" id="resetBtn">
+        🔄 重新計算
+    </button>
+</div>
+
+                <!-- Disclaimer -->
+                <div class="disclaimer">
+                    <h4>⚠️ 免責聲明</h4>
+                    <p>
+                        本工具計算結果僅供初步評估參考，實際稅務申報應以國稅局核定為準。<br>
+                        稅務規劃涉及個人財務狀況、法規變動等多重因素，建議諮詢專業會計師或稅務顧問。<br>
+                        <strong>適用稅務年度：2024年（2025年5月申報適用）</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 2024年稅務常數
+        const TAX_CONSTANTS_2024 = {
+            exemption: {
+                normal: 97000,
+                elder: 145500,
+            },
+            standardDeduction: {
+                single: 131000,
+                married: 262000,
+            },
+            specialDeduction: {
+                salary: 218000,
+            },
+            corporateTax: {
+                rate: 0.20,
+                threshold: 120000,
+            },
+            dividendTax: {
+                creditRate: 0.085,
+                creditLimit: 80000,
+                separateRate: 0.28,
+            },
+            healthInsurance: {
+                rate: 0.0211,
+                threshold: 20000,
+            },
+            legalReserve: 0.10,
+            retainedEarningsTax: 0.05,
+            taxBrackets: [
+                { limit: 590000, rate: 0.05, deduction: 0 },
+                { limit: 1330000, rate: 0.12, deduction: 41300 },
+                { limit: 2660000, rate: 0.20, deduction: 147700 },
+                { limit: 4980000, rate: 0.30, deduction: 413700 },
+                { limit: Infinity, rate: 0.40, deduction: 911700 }
+            ]
+        };
+
+        // Tooltip 功能（支援觸控裝置）
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ 頁面已載入，初始化中...');
+            
+            const tooltips = document.querySelectorAll('.info-tooltip');
+            
+            tooltips.forEach(tooltip => {
+                tooltip.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    tooltips.forEach(t => {
+                        if (t !== this) t.classList.remove('active');
+                    });
+                    this.classList.toggle('active');
+                });
+            });
+
+            document.addEventListener('click', function() {
+                tooltips.forEach(t => t.classList.remove('active'));
+            });
+
+            // 數字輸入格式化
+            const numberInputs = ['revenue', 'salary'];
+            numberInputs.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('blur', function() {
+                        formatNumberInput(this);
+                    });
+                    input.addEventListener('focus', function() {
+                        this.value = this.value.replace(/,/g, '');
+                    });
+                }
+            });
+
+            // 監聽營收輸入
+            const revenueInput = document.getElementById('revenue');
+            if (revenueInput) {
+                revenueInput.addEventListener('input', function() {
+                    const revenue = parseFormattedNumber(this.value);
+                    const warningBox = document.getElementById('revenueWarning');
+                    const profitRateInput = document.getElementById('profitRate');
+                    
+                    if (revenue > 30000000) {
+                        warningBox.style.display = 'flex';
+                        profitRateInput.style.borderColor = 'var(--warning)';
+                    } else {
+                        warningBox.style.display = 'none';
+                        profitRateInput.style.borderColor = 'var(--border)';
+                    }
+                });
+            }
+
+            // 監聽股權占比輸入
+            const shareholdingInput = document.getElementById('shareholdingRatio');
+            if (shareholdingInput) {
+                shareholdingInput.addEventListener('input', function() {
+                    const ratio = parseFloat(this.value) || 0;
+                    if (ratio < 0 || ratio > 100) {
+                        this.style.borderColor = 'var(--danger)';
+                    } else {
+                        this.style.borderColor = 'var(--border)';
+                    }
+                });
+            }
+
+            console.log('✅ 初始化完成');
+        });
+
+        // 數字格式化
+        function formatNumberInput(input) {
+            let value = input.value.replace(/,/g, '');
+            if (value && !isNaN(value)) {
+                input.value = parseFloat(value).toLocaleString('en-US');
+            }
+        }
+
+        // 解析格式化的數字
+        function parseFormattedNumber(str) {
+            return parseFloat(str.replace(/,/g, '')) || 0;
+        }
+
+        // 計算按鈕事件
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            console.log('🖱️ 計算按鈕被點擊');
+            calculateTax();
+        });
+
+        // 重置按鈕事件
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            resetForm();
+        });
+
+        // 主計算函數
+        function calculateTax() {
+            console.log('🚀 開始計算...');
+            document.getElementById('loading').classList.add('active');
+            
+            setTimeout(() => {
+                try {
+                    performCalculation();
+                    document.getElementById('loading').classList.remove('active');
+                    console.log('✅ 計算完成');
+                } catch (error) {
+                    console.error('❌ 計算錯誤:', error);
+                    alert('計算過程中發生錯誤，請檢查輸入資料：\n' + error.message);
+                    document.getElementById('loading').classList.remove('active');
+                }
+            }, 800);
+        }
+
+        function performCalculation() {
+            console.log('📊 執行計算函數');
+            
+            // 取得輸入值
+            const revenue = parseFormattedNumber(document.getElementById('revenue').value);
+            const industry = document.getElementById('industry').value;
+            const profitRate = parseFloat(document.getElementById('profitRate').value) || 0;
+            const incomeStandard = parseFloat(document.getElementById('incomeStandard').value) || 0;
+            const netProfitRate = parseFloat(document.getElementById('netProfitRate').value) || 0;
+            
+            const shareholdingRatio = parseFloat(document.getElementById('shareholdingRatio').value) || 100;
+            const profitSource = document.getElementById('profitSource').value;
+            const distributionRatio = parseFloat(document.getElementById('distributionRatio').value) || 100;
+            const maritalStatus = document.getElementById('maritalStatus').value;
+            const salary = parseFormattedNumber(document.getElementById('salary').value);
+            const children = parseInt(document.getElementById('children').value) || 0;
+
+            console.log('📥 輸入值:', { revenue, profitRate, incomeStandard, netProfitRate, shareholdingRatio, profitSource, distributionRatio, maritalStatus, salary, children });
+
+            // 驗證必填欄位
+            if (revenue === 0) {
+                throw new Error('請填寫預估總營業收入！');
+            }
+
+            if (incomeStandard === 0 || netProfitRate === 0) {
+                throw new Error('請填寫完整的稅率資料（所得額標準、淨利率）！');
+            }
+
+            if (shareholdingRatio <= 0 || shareholdingRatio > 100) {
+                throw new Error('股權占比必須在0-100%之間！');
+            }
+
+            if (distributionRatio < 0 || distributionRatio > 100) {
+                throw new Error('盈餘分配比例必須在0-100%之間！');
+            }
+
+            // 檢查營收是否超過3000萬
+            const canUseBookAudit = revenue <= 30000000;
+
+            // 1. 三種方式計算課稅所得額
+            const taxableIncome1 = canUseBookAudit && profitRate > 0 ? revenue * (profitRate / 100) : Infinity;
+            const taxableIncome2 = revenue * (incomeStandard / 100);
+            const taxableIncome3 = revenue * (netProfitRate / 100);
+
+            // 2. 計算各自的營所稅
+            const corporateTax1 = taxableIncome1 !== Infinity ? calculateCorporateTax(taxableIncome1) : Infinity;
+            const corporateTax2 = calculateCorporateTax(taxableIncome2);
+            const corporateTax3 = calculateCorporateTax(taxableIncome3);
+
+            const afterTaxProfit1 = taxableIncome1 !== Infinity ? taxableIncome1 - corporateTax1 : 0;
+            const afterTaxProfit2 = taxableIncome2 - corporateTax2;
+            const afterTaxProfit3 = taxableIncome3 - corporateTax3;
+
+            console.log('💰 計算結果:', { taxableIncome1, taxableIncome2, taxableIncome3, corporateTax1, corporateTax2, corporateTax3 });
+
+            // 顯示三種方式比較表格
+            const comparisonTable = document.getElementById('comparisonTable');
+            let comparisonHTML = '';
+
+            if (canUseBookAudit && profitRate > 0) {
+                comparisonHTML += `
+                    <tr>
+                        <td><strong>方式一：擴大書審純益率</strong></td>
+                        <td class="highlight-number" style="text-align: right;">${formatCurrency(taxableIncome1)}</td>
+                        <td style="text-align: right;">${formatCurrency(corporateTax1)}</td>
+                        <td style="text-align: right;">${formatCurrency(afterTaxProfit1)}</td>
+                        <td>營收 × ${profitRate}%</td>
+                    </tr>
+                `;
+            } else if (!canUseBookAudit) {
+                comparisonHTML += `
+                    <tr style="background: #fff3cd;">
+                        <td><strong>方式一：擴大書審純益率</strong></td>
+                        <td style="text-align: right;" colspan="3">❌ 不適用（營收超過3000萬）</td>
+                        <td>營收超過上限</td>
+                    </tr>
+                `;
+            }
+
+            comparisonHTML += `
+                <tr>
+                    <td><strong>方式二：所得額標準</strong></td>
+                    <td class="highlight-number" style="text-align: right;">${formatCurrency(taxableIncome2)}</td>
+                    <td style="text-align: right;">${formatCurrency(corporateTax2)}</td>
+                    <td style="text-align: right;">${formatCurrency(afterTaxProfit2)}</td>
+                    <td>營收 × ${incomeStandard}%</td>
+                </tr>
+                <tr>
+                    <td><strong>方式三：淨利率</strong></td>
+                    <td class="highlight-number" style="text-align: right;">${formatCurrency(taxableIncome3)}</td>
+                    <td style="text-align: right;">${formatCurrency(corporateTax3)}</td>
+                    <td style="text-align: right;">${formatCurrency(afterTaxProfit3)}</td>
+                    <td>營收 × ${netProfitRate}%</td>
+                </tr>
+            `;
+            
+            comparisonTable.innerHTML = comparisonHTML;
+
+            // 視覺化比較圖表
+            const validTaxes = [corporateTax1, corporateTax2, corporateTax3].filter(t => t !== Infinity);
+            const maxTax = Math.max(...validTaxes);
+            const comparisonChart = document.getElementById('comparisonChart');
+            let chartHTML = '';
+
+            if (canUseBookAudit && profitRate > 0) {
+                chartHTML += `
+                    <div class="bar-item">
+                        <div class="bar-label">擴大書審純益率 (${profitRate}%)</div>
+                        <div class="bar-wrapper">
+                            <div class="bar-fill" style="width: ${(corporateTax1 / maxTax * 100)}%; background: linear-gradient(90deg, #4CAF50 0%, #66BB6A 100%);">
+                                ${formatCurrency(corporateTax1)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            chartHTML += `
+                <div class="bar-item">
+                    <div class="bar-label">所得額標準 (${incomeStandard}%)</div>
+                    <div class="bar-wrapper">
+                        <div class="bar-fill" style="width: ${(corporateTax2 / maxTax * 100)}%; background: linear-gradient(90deg, #2196F3 0%, #42A5F5 100%);">
+                            ${formatCurrency(corporateTax2)}
+                        </div>
+                    </div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">淨利率 (${netProfitRate}%)</div>
+                    <div class="bar-wrapper">
+                        <div class="bar-fill" style="width: ${(corporateTax3 / maxTax * 100)}%; background: linear-gradient(90deg, var(--secondary-orange) 0%, #D4915E 100%);">
+                            ${formatCurrency(corporateTax3)}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            comparisonChart.innerHTML = chartHTML;
+
+            // 3. 選擇最優方案（用於營所稅比較）
+            const minTax = Math.min(...validTaxes);
+            let selectedMethod = '';
+            let selectedTaxableIncome = 0;
+            let selectedCorporateTax = 0;
+            let selectedAfterTaxProfit = 0;
+
+            if (minTax === corporateTax1 && corporateTax1 !== Infinity) {
+                selectedMethod = `擴大書審純益率 ${profitRate}%`;
+                selectedTaxableIncome = taxableIncome1;
+                selectedCorporateTax = corporateTax1;
+                selectedAfterTaxProfit = afterTaxProfit1;
+            } else if (minTax === corporateTax2) {
+                selectedMethod = `所得額標準 ${incomeStandard}%`;
+                selectedTaxableIncome = taxableIncome2;
+                selectedCorporateTax = corporateTax2;
+                selectedAfterTaxProfit = afterTaxProfit2;
+            } else {
+                selectedMethod = `淨利率 ${netProfitRate}%`;
+                selectedTaxableIncome = taxableIncome3;
+                selectedCorporateTax = corporateTax3;
+                selectedAfterTaxProfit = afterTaxProfit3;
+            }
+
+            console.log('🏆 選擇的最優方案:', { selectedMethod, selectedTaxableIncome, selectedCorporateTax });
+
+            // 根據使用者選擇決定盈餘分配來源
+            let selectedAfterTaxForDistribution;
+            let selectedMethodForDistribution;
+            let selectedCorporateTaxForDistribution;
+
+            switch(profitSource) {
+                case 'bookAudit':
+                    if (canUseBookAudit && profitRate > 0) {
+                        selectedAfterTaxForDistribution = afterTaxProfit1;
+                        selectedMethodForDistribution = `擴大書審純益率 ${profitRate}%`;
+                        selectedCorporateTaxForDistribution = corporateTax1;
+                    } else {
+                        alert('⚠️ 無法使用擴大書審（營收超過3000萬或未填寫），自動改用最優方式');
+                        selectedAfterTaxForDistribution = selectedAfterTaxProfit;
+                        selectedMethodForDistribution = selectedMethod;
+                        selectedCorporateTaxForDistribution = selectedCorporateTax;
+                    }
+                    break;
+                case 'standard':
+                    selectedAfterTaxForDistribution = afterTaxProfit2;
+                    selectedMethodForDistribution = `所得額標準 ${incomeStandard}%`;
+                    selectedCorporateTaxForDistribution = corporateTax2;
+                    break;
+                case 'netProfit':
+                    selectedAfterTaxForDistribution = afterTaxProfit3;
+                    selectedMethodForDistribution = `淨利率 ${netProfitRate}%`;
+                    selectedCorporateTaxForDistribution = corporateTax3;
+                    break;
+                case 'optimal':
+                default:
+                    selectedAfterTaxForDistribution = selectedAfterTaxProfit;
+                    selectedMethodForDistribution = selectedMethod;
+                    selectedCorporateTaxForDistribution = selectedCorporateTax;
+                    break;
+            }
+
+            // 從選定的稅後淨利開始計算盈餘分配
+            const legalReserve = selectedAfterTaxForDistribution * 0.10;
+            const distributableProfit = selectedAfterTaxForDistribution - legalReserve;
+            const actualDistributedProfit = distributableProfit * (distributionRatio / 100);
+            const retainedEarnings = distributableProfit - actualDistributedProfit;
+
+            // 未分配盈餘加徵稅（簡化版）
+            const retainedEarningsTax = retainedEarnings > 0 ? retainedEarnings * 0.05 : 0;
+
+            console.log('📊 盈餘分配計算:', {
+                來源: selectedMethodForDistribution,
+                稅後淨利: selectedAfterTaxForDistribution,
+                法定盈餘公積: legalReserve,
+                可分配盈餘: distributableProfit,
+                分配比例: distributionRatio + '%',
+                實際分配: actualDistributedProfit,
+                保留盈餘: retainedEarnings,
+                保留盈餘稅: retainedEarningsTax
+            });
+
+            // 顯示計算方式說明
+            const methodInfo = document.getElementById('calculationMethodInfo');
+            const methodDesc = document.getElementById('methodDescription');
+            
+            if (!canUseBookAudit) {
+                methodInfo.className = 'alert-box alert-warning';
+                methodDesc.innerHTML = `
+                    <strong>⚠️ 營收超過3000萬元，無法使用擴大書審</strong><br>
+                    系統已自動排除擴大書審純益率，採用以下方式計算：<br>
+                    • 所得額標準 ${incomeStandard}%：${formatCurrency(taxableIncome2)}<br>
+                    • 淨利率 ${netProfitRate}%：${formatCurrency(taxableIncome3)}<br>
+                    <strong style="color: var(--secondary-orange);">✓ 營所稅最優：${selectedMethod} = ${formatCurrency(selectedTaxableIncome)}</strong><br>
+                    <strong style="color: var(--primary-blue);">✓ 盈餘分配來源：${selectedMethodForDistribution}</strong>
+                `;
+            } else {
+                methodInfo.className = 'alert-box alert-info';
+                methodDesc.innerHTML = `
+                    系統已比較${profitRate > 0 ? '三' : '二'}種計算方式：<br>
+                    ${profitRate > 0 ? `• 擴大書審純益率 ${profitRate}%：${formatCurrency(taxableIncome1)}<br>` : ''}
+                    • 所得額標準 ${incomeStandard}%：${formatCurrency(taxableIncome2)}<br>
+                    • 淨利率 ${netProfitRate}%：${formatCurrency(taxableIncome3)}<br>
+                    <strong style="color: var(--secondary-orange);">✓ 營所稅最優：${selectedMethod} = ${formatCurrency(selectedTaxableIncome)}</strong><br>
+                    <strong style="color: var(--primary-blue);">✓ 盈餘分配來源：${selectedMethodForDistribution}</strong>
+                `;
+            }
+
+            // 4. 個人綜所計算
+            const deductions = calculateDeductions(maritalStatus, children);
+            
+            // 計算薪資扣除額
+            const salaryDeduction = Math.min(salary, TAX_CONSTANTS_2024.specialDeduction.salary);
+            const netSalary = Math.max(0, salary - salaryDeduction);
+
+            // 情境A：公司制 - 個人股利計算
+            const personalDividend = actualDistributedProfit * (shareholdingRatio / 100);
+
+            const healthInsurance = personalDividend >= TAX_CONSTANTS_2024.healthInsurance.threshold 
+                ? personalDividend * TAX_CONSTANTS_2024.healthInsurance.rate 
+                : 0;
+            
+            // 方案1：合併計稅
+            const totalIncomeA1 = personalDividend + netSalary;
+            const taxableIncomeA1 = Math.max(0, totalIncomeA1 - deductions.total);
+            const personalTaxA1 = calculateProgressiveTax(taxableIncomeA1);
+            const dividendCredit = Math.min(
+                personalDividend * TAX_CONSTANTS_2024.dividendTax.creditRate,
+                TAX_CONSTANTS_2024.dividendTax.creditLimit,
+                personalTaxA1
+            );
+            const finalTaxA1 = Math.max(0, personalTaxA1 - dividendCredit);
+            
+            // 方案2：分開計稅
+            const dividendTaxSeparate = personalDividend * TAX_CONSTANTS_2024.dividendTax.separateRate;
+            const otherIncomeA2 = netSalary;
+            const taxableIncomeA2 = Math.max(0, otherIncomeA2 - deductions.total);
+            const otherIncomeTax = calculateProgressiveTax(taxableIncomeA2);
+            const finalTaxA2 = dividendTaxSeparate + otherIncomeTax;
+            
+            // 選擇較優方案
+            const useMethod1 = finalTaxA1 <= finalTaxA2;
+            const finalTaxA = useMethod1 ? finalTaxA1 : finalTaxA2;
+            const taxMethod = useMethod1 ? '合併計稅' : '分開計稅';
+            const marginalRateA = getMarginalTaxRate(taxableIncomeA1);
+            
+            document.getElementById('dividendMethodBadge').textContent
+ = `採用${taxMethod}`;
+
+            // 顯示個人綜所表格 - 公司制
+            const personalTaxCompanyTable = document.getElementById('personalTaxCompanyTable');
+            let companyTableHTML = `
+                <tr>
+                    <td colspan="3" style="background: var(--light-beige); font-weight: bold; color: var(--primary-blue);">
+                        ✅ 系統選擇：${taxMethod}（${useMethod1 ? '股利併入綜所稅，享8.5%可抵減稅額' : '股利單獨以28%計稅'}）
+                    </td>
+                </tr>
+                <tr style="background: #fff3cd;">
+                    <td><strong>盈餘分配來源</strong></td>
+                    <td style="text-align: right;"><strong>${formatCurrency(selectedAfterTaxForDistribution)}</strong></td>
+                    <td><strong>採用：${selectedMethodForDistribution}</strong></td>
+                </tr>
+                <tr>
+                    <td>扣除法定盈餘公積（10%）</td>
+                    <td style="text-align: right; color: var(--danger);">-${formatCurrency(legalReserve)}</td>
+                    <td>分配來源 × 10%</td>
+                </tr>
+                <tr class="subtotal-row">
+                    <td>可分配盈餘</td>
+                    <td style="text-align: right;">${formatCurrency(distributableProfit)}</td>
+                    <td>分配來源 - 法定盈餘公積</td>
+                </tr>
+                <tr style="background: #d4edda;">
+                    <td><strong>公司實際分配盈餘（${distributionRatio}%）</strong></td>
+                    <td class="highlight-number" style="text-align: right;"><strong>${formatCurrency(actualDistributedProfit)}</strong></td>
+                    <td><strong>可分配盈餘 × ${distributionRatio}%</strong></td>
+                </tr>
+                ${retainedEarnings > 0 ? `
+                <tr>
+                    <td>保留盈餘（未分配）</td>
+                    <td style="text-align: right; color: #856404;">${formatCurrency(retainedEarnings)}</td>
+                    <td>未分配部分（${(100 - distributionRatio).toFixed(1)}%）</td>
+                </tr>
+                <tr>
+                    <td>保留盈餘加徵稅（5%）</td>
+                    <td style="text-align: right; color: var(--danger);">${formatCurrency(retainedEarningsTax)}</td>
+                    <td>未分配盈餘需額外課稅</td>
+                </tr>
+                ` : ''}
+                <tr class="subtotal-row">
+                    <td>個人股利所得（${shareholdingRatio}%）</td>
+                    <td class="highlight-number" style="text-align: right;">${formatCurrency(personalDividend)}</td>
+                    <td>實際分配 × 持股比例</td>
+                </tr>
+                <tr>
+                    <td>薪資所得</td>
+                    <td style="text-align: right;">${formatCurrency(salary)}</td>
+                    <td>年度薪資收入</td>
+                </tr>
+                <tr>
+                    <td>薪資所得特別扣除額</td>
+                    <td style="text-align: right; color: green;">-${formatCurrency(salaryDeduction)}</td>
+                    <td>上限${formatCurrency(TAX_CONSTANTS_2024.specialDeduction.salary)}</td>
+                </tr>
+            `;
+
+            if (useMethod1) {
+                companyTableHTML += `
+                    <tr class="subtotal-row">
+                        <td>綜合所得總額</td>
+                        <td style="text-align: right;">${formatCurrency(totalIncomeA1)}</td>
+                        <td>股利+薪資淨額</td>
+                    </tr>
+                    <tr>
+                        <td>免稅額</td>
+                        <td style="text-align: right; color: green;">-${formatCurrency(deductions.exemption)}</td>
+                        <td>${deductions.exemptionDesc}</td>
+                    </tr>
+                    <tr>
+                        <td>標準扣除額</td>
+                        <td style="text-align: right; color: green;">-${formatCurrency(deductions.standardDeduction)}</td>
+                        <td>${deductions.standardDeductionDesc}</td>
+                    </tr>
+                    <tr class="subtotal-row">
+                        <td>課稅所得</td>
+                        <td class="highlight-number" style="text-align: right;">${formatCurrency(taxableIncomeA1)}</td>
+                        <td>總所得 - 免稅額 - 扣除額</td>
+                    </tr>
+                    <tr>
+                        <td>應納稅額（累進稅率）</td>
+                        <td style="text-align: right;">${formatCurrency(personalTaxA1)}</td>
+                        <td>依綜所稅級距計算</td>
+                    </tr>
+                    <tr>
+                        <td>股利可抵減稅額（8.5%）</td>
+                        <td style="text-align: right; color: green;">-${formatCurrency(dividendCredit)}</td>
+                        <td>股利×8.5%（上限8萬）</td>
+                    </tr>
+                    <tr class="subtotal-row">
+                        <td>實繳綜所稅</td>
+                        <td style="text-align: right;">${formatCurrency(finalTaxA)}</td>
+                        <td>應納稅額 - 可抵減稅額</td>
+                    </tr>
+                `;
+            } else {
+                companyTableHTML += `
+                    <tr style="height: 10px;"></tr>
+                    <tr>
+                        <td>股利分開計稅（28%）</td>
+                        <td style="text-align: right;">${formatCurrency(dividendTaxSeparate)}</td>
+                        <td>股利 × 28%</td>
+                    </tr>
+                    <tr style="height: 10px;"></tr>
+                    <tr class="subtotal-row">
+                        <td>其他所得總額</td>
+                        <td style="text-align: right;">${formatCurrency(otherIncomeA2)}</td>
+                        <td>薪資淨額</td>
+                    </tr>
+                    <tr>
+                        <td>免稅額</td>
+                        <td style="text-align: right; color: green;">-${formatCurrency(deductions.exemption)}</td>
+                        <td>${deductions.exemptionDesc}</td>
+                    </tr>
+                    <tr>
+                        <td>標準扣除額</td>
+                        <td style="text-align: right; color: green;">-${formatCurrency(deductions.standardDeduction)}</td>
+                        <td>${deductions.standardDeductionDesc}</td>
+                    </tr>
+                    <tr class="subtotal-row">
+                        <td>其他所得課稅所得</td>
+                        <td style="text-align: right;">${formatCurrency(taxableIncomeA2)}</td>
+                        <td>其他所得 - 免稅額 - 扣除額</td>
+                    </tr>
+                    <tr>
+                        <td>其他所得稅額（累進稅率）</td>
+                        <td style="text-align: right;">${formatCurrency(otherIncomeTax)}</td>
+                        <td>依綜所稅級距計算</td>
+                    </tr>
+                    <tr class="subtotal-row">
+                        <td>實繳綜所稅</td>
+                        <td style="text-align: right;">${formatCurrency(finalTaxA)}</td>
+                        <td>股利稅額 + 其他所得稅額</td>
+                    </tr>
+                `;
+            }
+
+            companyTableHTML += `
+                ${healthInsurance > 0 ? `
+                <tr>
+                    <td>二代健保補充保費（2.11%）</td>
+                    <td style="text-align: right; color: var(--danger);">${formatCurrency(healthInsurance)}</td>
+                    <td>股利 ≥ 2萬需扣繳</td>
+                </tr>
+                ` : ''}
+                <tr class="total-row">
+                    <td>個人層級總稅負</td>
+                    <td style="text-align: right;">${formatCurrency(finalTaxA + healthInsurance)}</td>
+                    <td>綜所稅 + 健保費</td>
+                </tr>
+                <tr class="total-row">
+                    <td><strong>公司制總稅負</strong></td>
+                    <td style="text-align: right;"><strong>${formatCurrency(selectedCorporateTaxForDistribution + retainedEarningsTax + finalTaxA + healthInsurance)}</strong></td>
+                    <td>營所稅 + 保留盈餘稅 + 個人稅</td>
+                </tr>
+            `;
+
+            personalTaxCompanyTable.innerHTML = companyTableHTML;
+
+            // 情境B：行號制
+            const businessIncome = selectedTaxableIncome;
+            const totalIncomeB = businessIncome + netSalary;
+            const taxableIncomeB = Math.max(0, totalIncomeB - deductions.total);
+            const personalTaxB = calculateProgressiveTax(taxableIncomeB);
+            const marginalRateB = getMarginalTaxRate(taxableIncomeB);
+
+            const personalTaxSoleTable = document.getElementById('personalTaxSoleTable');
+            personalTaxSoleTable.innerHTML = `
+                <tr>
+                    <td>營利所得</td>
+                    <td class="highlight-number" style="text-align: right;">${formatCurrency(businessIncome)}</td>
+                    <td>行號課稅所得（直接併入個人）</td>
+                </tr>
+                <tr>
+                    <td>薪資所得</td>
+                    <td style="text-align: right;">${formatCurrency(salary)}</td>
+                    <td>年度薪資收入</td>
+                </tr>
+                <tr>
+                    <td>薪資所得特別扣除額</td>
+                    <td style="text-align: right; color: green;">-${formatCurrency(salaryDeduction)}</td>
+                    <td>上限${formatCurrency(TAX_CONSTANTS_2024.specialDeduction.salary)}</td>
+                </tr>
+                <tr class="subtotal-row">
+                    <td>綜合所得總額</td>
+                    <td style="text-align: right;">${formatCurrency(totalIncomeB)}</td>
+                    <td>營利+薪資淨額</td>
+                </tr>
+                <tr>
+                    <td>免稅額</td>
+                    <td style="text-align: right; color: green;">-${formatCurrency(deductions.exemption)}</td>
+                    <td>${deductions.exemptionDesc}</td>
+                </tr>
+                <tr>
+                    <td>標準扣除額</td>
+                    <td style="text-align: right; color: green;">-${formatCurrency(deductions.standardDeduction)}</td>
+                    <td>${deductions.standardDeductionDesc}</td>
+                </tr>
+                <tr class="subtotal-row">
+                    <td>課稅所得</td>
+                    <td class="highlight-number" style="text-align: right;">${formatCurrency(taxableIncomeB)}</td>
+                    <td>總所得 - 免稅額 - 扣除額</td>
+                </tr>
+                <tr class="total-row">
+                    <td>實繳綜所稅</td>
+                    <td style="text-align: right;">${formatCurrency(personalTaxB)}</td>
+                    <td>依綜所稅級距計算</td>
+                </tr>
+                <tr class="total-row">
+                    <td>總稅負（僅綜所稅）</td>
+                    <td style="text-align: right;">${formatCurrency(personalTaxB)}</td>
+                    <td>行號無營所稅</td>
+                </tr>
+            `;
+
+            // 5. 比較分析
+            const totalTaxCompany = selectedCorporateTaxForDistribution + retainedEarningsTax + finalTaxA + healthInsurance;
+            const totalTaxSole = personalTaxB;
+            const taxDifference = Math.abs(totalTaxCompany - totalTaxSole);
+            const recommended = totalTaxCompany < totalTaxSole ? 'company' : 'sole';
+            const savingsPercentage = ((taxDifference / Math.max(totalTaxCompany, totalTaxSole)) * 100).toFixed(2);
+
+            const netIncomeCompany = personalDividend - finalTaxA - healthInsurance;
+            const netIncomeSole = selectedTaxableIncome - personalTaxB;
+
+            console.log('🎯 最終結果:', { totalTaxCompany, totalTaxSole, recommended });
+
+            // 顯示結論摘要
+            displayConclusion(recommended, taxDifference, savingsPercentage, totalTaxCompany, totalTaxSole, revenue);
+
+            // 顯示總稅負比較圖表
+            displayTotalTaxComparison(totalTaxCompany, totalTaxSole);
+
+            // 顯示比較卡片
+            const comparisonGrid = document.getElementById('comparisonGrid');
+            comparisonGrid.innerHTML = `
+                <div class="comparison-card ${recommended === 'company' ? 'recommended' : ''}">
+                    <h3 class="comparison-title">🏢 公司制</h3>
+                    <div class="comparison-item">
+                        <span>營所稅計算方式</span>
+                        <strong style="color: var(--secondary-orange);">${selectedMethod}</strong>
+                    </div>
+                    <div class="comparison-item">
+                        <span>課稅所得額</span>
+                        <strong>${formatCurrency(selectedTaxableIncome)}</strong>
+                    </div>
+                    <div class="comparison-item">
+                        <span>營利事業所得稅（20%）</span>
+                        <strong>${formatCurrency(selectedCorporateTax)}</strong>
+                    </div>
+                    <div class="comparison-item">
+                        <span>稅後淨利</span>
+                        <strong>${formatCurrency(selectedAfterTaxProfit)}</strong>
+                    </div>
+                    <div style="border-top: 2px solid var(--secondary-orange); margin: 15px 0; padding-top: 15px;">
+                        <div class="comparison-item">
+                            <span><strong>盈餘分配來源</strong></span>
+                            <strong style="color: var(--secondary-orange);">${selectedMethodForDistribution}</strong>
+                        </div>
+                        <div class="comparison-item">
+                            <span>分配來源稅後淨利</span>
+                            <strong>${formatCurrency(selectedAfterTaxForDistribution)}</strong>
+                        </div>
+                        <div class="comparison-item">
+                            <span>法定盈餘公積（10%）</span>
+                            <strong style="color: var(--danger);">-${formatCurrency(legalReserve)}</strong>
+                        </div>
+                        <div class="comparison-item">
+                            <span>可分配盈餘</span>
+                            <strong>${formatCurrency(distributableProfit)}</strong>
+                        </div>
+                        <div class="comparison-item">
+                            <span>實際分配盈餘（${distributionRatio}%）</span>
+                            <strong>${formatCurrency(actualDistributedProfit)}</strong>
+                        </div>
+                        ${retainedEarnings > 0 ? `
+                        <div class="comparison-item">
+                            <span>保留盈餘</span>
+                            <strong style="color: #856404;">${formatCurrency(retainedEarnings)}</strong>
+                        </div>
+                        <div class="comparison-item">
+                            <span>保留盈餘加徵稅（5%）</span>
+                            <strong style="color: var(--danger);">${formatCurrency(retainedEarningsTax)}</strong>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="comparison-item">
+                        <span>個人股利（${shareholdingRatio}%）</span>
+                        <strong>${formatCurrency(personalDividend)}</strong>
+                    </div>
+                    <div class="comparison-item">
+                        <span>個人綜合所得稅</span>
+                        <strong>${formatCurrency(finalTaxA)}</strong>
+                    </div>
+                    <div class="comparison-item">
+                        <span>股利課稅方式</span>
+                        <strong style="color: var(--secondary-orange);">${taxMethod}</strong>
+                    </div>
+                    ${useMethod1 ? `
+                    <div class="comparison-item">
+                        <span>股利可抵減稅額</span>
+                        <strong style="color: green;">-${formatCurrency(dividendCredit)}</strong>
+                    </div>
+                    ` : ''}
+                    ${healthInsurance > 0 ? `
+                    <div class="comparison-item">
+                        <span>二代健保補充保費（2.11%）</span>
+                        <strong style="color: var(--danger);">${formatCurrency(healthInsurance)}</strong>
+                    </div>
+                    ` : ''}
+                    <div class="comparison-highlight">
+                        <div class="label">總稅負</div>
+                        <div class="value">${formatCurrency(totalTaxCompany)}</div>
+                    </div>
+                    <div class="comparison-item">
+                        <span>實際可支配所得</span>
+                        <strong style="color: var(--success); font-size: 18px;">${formatCurrency(netIncomeCompany)}</strong>
+                    </div>
+                    <div class="comparison-item" style="border-top: 2px solid var(--border); padding-top: 15px; margin-top: 10px;">
+                        <span style="font-weight: bold;">有效稅率</span>
+                        <strong style="color: var(--secondary-orange);">${((totalTaxCompany / revenue) * 100).toFixed(2)}%</strong>
+                    </div>
+                </div>
+
+                <div class="comparison-card ${recommended === 'sole' ? 'recommended' : ''}">
+                    <h3 class="comparison-title">🏪 行號制</h3>
+                    <div class="comparison-item">
+                        <span>計算方式</span>
+                        <strong style="color: var(--secondary-orange);">${selectedMethod}</strong>
+                    </div>
+                    <div class="comparison-item">
+                        <span>課稅所得額</span>
+                        <strong>${formatCurrency(selectedTaxableIncome)}</strong>
+                    </div>
+                    <div class="comparison-item">
+                        <span>營利事業所得稅</span>
+                        <strong>$0</strong>
+                    </div>
+                    <div class="comparison-item">
+                        <span>稅後淨利</span>
+                        <strong>${formatCurrency(selectedTaxableIncome)}</strong>
+                    </div>
+                    <div class="comparison-item">
+                        <span>法定盈餘公積</span>
+                        <strong>$0</strong>
+                    </div>
+                    <div class="comparison-item">
+                        <span>可分配盈餘</span>
+                        <strong>${formatCurrency(selectedTaxableIncome)}</strong>
+                    </div>
+                    <div class="comparison-item">
+                        <span>實際分配盈餘</span>
+                        <strong>無（直接併入所得）</strong>
+                    </div>
+                    <div class="comparison-item">
+                        <span>個人股利</span>
+                        <strong>無（直接併入所得）</strong>
+                    </div>
+                    <div class="comparison-item">
+                        <span>個人綜合所得稅</span>
+                        <strong>${formatCurrency(personalTaxB)}</strong>
+                    </div>
+                    <div class="comparison-item">
+                        <span>股利課稅方式</span>
+                        <strong>無（直接併入所得）</strong>
+                    </div>
+                    <div class="comparison-item">
+                        <span>可抵減稅額</span>
+                        <strong>$0</strong>
+                    </div>
+                    <div class="comparison-item">
+                        <span>二代健保補充保費</span>
+                        <strong>$0</strong>
+                    </div>
+                    <div class="comparison-highlight">
+                        <div class="label">總稅負</div>
+                        <div class="value">${formatCurrency(totalTaxSole)}</div>
+                    </div>
+                    <div class="comparison-item">
+                        <span>實際可支配所得</span>
+                        <strong style="color: var(--success); font-size: 18px;">${formatCurrency(netIncomeSole)}</strong>
+                    </div>
+                    <div class="comparison-item" style="border-top: 2px solid var(--border); padding-top: 15px; margin-top: 10px;">
+                        <span style="font-weight: bold;">有效稅率</span>
+                        <strong style="color: var(--secondary-orange);">${((totalTaxSole / revenue) * 100).toFixed(2)}%</strong>
+                    </div>
+                </div>
+            `;
+
+            // 顯示結果區域
+            document.getElementById('resultsSection').style.display = 'block';
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // 顯示結論摘要
+        function displayConclusion(recommended, taxDifference, savingsPercentage, totalTaxCompany, totalTaxSole, revenue) {
+            const conclusionBox = document.getElementById('conclusionBox');
+            const recommendedText = recommended === 'company' ? '公司制' : '行號制';
+            const notRecommendedText = recommended === 'company' ? '行號制' : '公司制';
+            const effectiveRateCompany = ((totalTaxCompany / revenue) * 100).toFixed(2);
+            const effectiveRateSole = ((totalTaxSole / revenue) * 100).toFixed(2);
+
+            conclusionBox.innerHTML = `
+                <h3>🎯 結論摘要</h3>
+                <div class="highlight">建議採用：${recommendedText}</div>
+                <p style="font-size: 18px; margin-bottom: 15px;">
+                    相較於${notRecommendedText}，預估可節省稅負 <strong style="color: var(--secondary-orange); font-size: 24px;">${formatCurrency(taxDifference)}</strong>（約 ${savingsPercentage}%）
+                </p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">
+                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+                        <div style="font-size: 14px; opacity: 0.9;">公司制總稅負</div>
+                        <div style="font-size: 24px; font-weight: bold; margin-top: 5px;">${formatCurrency(totalTaxCompany)}</div>
+                        <div style="font-size: 12px; opacity: 0.8; margin-top: 5px;">有效稅率：${effectiveRateCompany}%</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+                        <div style="font-size: 14px; opacity: 0.9;">行號制總稅負</div>
+                        <div style="font-size: 24px; font-weight: bold; margin-top: 5px;">${formatCurrency(totalTaxSole)}</div>
+                        <div style="font-size: 12px; opacity: 0.8; margin-top: 5px;">有效稅率：${effectiveRateSole}%</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 顯示總稅負比較圖表
+        function displayTotalTaxComparison(totalTaxCompany, totalTaxSole) {
+            const maxTax = Math.max(totalTaxCompany, totalTaxSole);
+            const chart = document.getElementById('totalTaxComparisonChart');
+            
+            chart.innerHTML = `
+                <div class="bar-item">
+                    <div class="bar-label">🏢 公司制總稅負</div>
+                    <div class="bar-wrapper">
+                        <div class="bar-fill company" style="width: ${(totalTaxCompany / maxTax * 100)}%;">
+                            ${formatCurrency(totalTaxCompany)}
+                        </div>
+                    </div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">🏪 行號制總稅負</div>
+                    <div class="bar-wrapper">
+                        <div class="bar-fill sole" style="width: ${(totalTaxSole / maxTax * 100)}%;">
+                            ${formatCurrency(totalTaxSole)}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 計算營所稅
+        function calculateCorporateTax(taxableIncome) {
+            if (taxableIncome <= TAX_CONSTANTS_2024.corporateTax.threshold) {
+                return 0;
+            }
+            return taxableIncome * TAX_CONSTANTS_2024.corporateTax.rate;
+        }
+
+        // 計算免稅額與扣除額
+        function calculateDeductions(maritalStatus, children) {
+            const exemptionPerPerson = TAX_CONSTANTS_2024.exemption.normal;
+            const standardDeduction = TAX_CONSTANTS_2024.standardDeduction;
+
+            let exemption = 0;
+            let standardDed = 0;
+            let exemptionDesc = '';
+            let standardDeductionDesc = '';
+
+            // 計算免稅額
+            if (maritalStatus === 'single') {
+                exemption = exemptionPerPerson;
+                exemptionDesc = '單身1人';
+                standardDed = standardDeduction.single;
+                standardDeductionDesc = '標準扣除額（單身）';
+            } else {
+                exemption = exemptionPerPerson * 2;
+                exemptionDesc = '夫妻2人';
+                standardDed = standardDeduction.married;
+                standardDeductionDesc = '標準扣除額（夫妻）';
+            }
+
+            // 子女免稅額
+            if (children > 0) {
+                exemption += exemptionPerPerson * children;
+                exemptionDesc += ` + ${children}位子女`;
+            }
+
+            return {
+                exemption: exemption,
+                standardDeduction: standardDed,
+                total: exemption + standardDed,
+                exemptionDesc: exemptionDesc,
+                standardDeductionDesc: standardDeductionDesc
+            };
+        }
+
+        // 累進稅率計算
+        function calculateProgressiveTax(income) {
+            const brackets = TAX_CONSTANTS_2024.taxBrackets;
+
+            for (let bracket of brackets) {
+                if (income <= bracket.limit) {
+                    return Math.max(0, income * bracket.rate - bracket.deduction);
+                }
+            }
+            return 0;
+        }
+
+        // 取得邊際稅率
+        function getMarginalTaxRate(income) {
+            const brackets = TAX_CONSTANTS_2024.taxBrackets;
+            for (let bracket of brackets) {
+                if (income <= bracket.limit) {
+                    return (bracket.rate * 100).toFixed(0);
+                }
+            }
+            return '40';
+        }
+
+        // 格式化金額
+        function formatCurrency(amount) {
+            return '$' + Math.round(amount).toLocaleString('zh-TW');
+        }
+
+        // 重置表單
+        function resetForm() {
+            if (confirm('確定要重新計算嗎？目前的計算結果將會清除。')) {
+                document.getElementById('resultsSection').style.display = 'none';
+                document.getElementById('inputSection').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    </script>
+</body>
+</html>
