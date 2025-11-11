@@ -85,7 +85,7 @@ class BranchDashboardUpdater:
         logger.error(f"❌ GitHub API 錯誤: {e.status} - {e.data.get('message', 'Unknown error')}")
         return False
     except Exception as e:
-        logger.error(f"❌ 連接錯誤: {str(e)}")
+     logger.error(f"❌ 連接錯誤: {str(e)}")
         return False{str(e)}")
             return False
     
