@@ -4,6 +4,9 @@ __pycache__/
 *$py.class
 *.so
 .Python
+env/
+venv/
+ENV/
 build/
 develop-eggs/
 dist/
@@ -20,32 +23,20 @@ wheels/
 .installed.cfg
 *.egg
 
-# Virtual Environment
-venv/
-ENV/
-env/
-.venv
-
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+
+# OS
 .DS_Store
+Thumbs.db
 
 # Logs
 *.log
 
-# Environment Variables
-.env
-.env.local
-
-# Test
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Temporary
-*.tmp
-*.bak
+# Temporary files
+tmp/
+temp/
