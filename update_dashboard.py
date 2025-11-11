@@ -66,10 +66,9 @@ class BranchDashboardUpdater:
             logger.info("🔍 正在連接到 GitHub API...")
             self.github = Github(self.token)
             
-            # 測試連接並獲取當前用戶資訊
-            user = self.github.get_user()
-            logger.info(f"✅ 已連接，當前用戶: {user.login}")
-            
+          # 測試連接並獲取目標倉庫
+         # 注意: GITHUB_TOKEN 無法訪問 /user API，直接獲取倉庫即可
+                        
             # 獲取目標倉庫
             logger.info(f"📦 正在獲取倉庫: {self.repo_name}")
             self.repo = self.github.get_repo(self.repo_name)
