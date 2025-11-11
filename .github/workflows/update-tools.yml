@@ -1,0 +1,50 @@
+name: 🔄 Update Tools Dashboard
+
+on:
+  # 每天自動執行
+  schedule:
+    - cron: '0 */6 * * *'  # 每 6 小時執行一次
+  
+  # 手動觸發
+  workflow_dispatch:
+  
+  # 當 README 或腳本被修改時執行
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/update_tools.py'
+      - 'README.md'
+
+jobs:
+  update-dashboard:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: 📦 Install dependencies
+        run: |
+          pip install PyGithub
+      
+      - name: 🔄 Update tools dashboard
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.repository_owner }}
+        run: |
+          python scripts/update_tools.py
+      
+      - name: 💾 Commit and push if changed
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add README.md
+          git diff --quiet && git diff --staged --quiet || (git commit -m "🤖 自動更新工具列表 [$(date +'%Y-%m-%d %H:%M:%S')]" && git push)
