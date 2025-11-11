@@ -1,0 +1,8 @@
+# GitHub API
+PyGithub==2.1.1
+
+# HTTP Requests
+requests==2.31.0
+
+# Date and Time
+python-dateutil==2.8.2
