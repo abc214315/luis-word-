@@ -55,7 +55,7 @@ class BranchDashboardUpdater:
         self.github = None
         self.repo = None
         
-    def connect(self) -> bool:
+   def connect(self) -> bool:
     """
     連接到 GitHub API
     
@@ -66,9 +66,6 @@ class BranchDashboardUpdater:
         logger.info("🔍 正在連接到 GitHub API...")
         self.github = Github(self.token)
         
-        # 測試連接並獲取目標倉庫
-        # 注意: GITHUB_TOKEN 無法訪問 /user API，直接獲取倉庫即可
-                    
         # 獲取目標倉庫
         logger.info(f"📦 正在獲取倉庫: {self.repo_name}")
         self.repo = self.github.get_repo(self.repo_name)
@@ -85,9 +82,8 @@ class BranchDashboardUpdater:
         logger.error(f"❌ GitHub API 錯誤: {e.status} - {e.data.get('message', 'Unknown error')}")
         return False
     except Exception as e:
-     logger.error(f"❌ 連接錯誤: {str(e)}")
-        return False{str(e)}")
-            return False
+        logger.error(f"❌ 連接錯誤: {str(e)}")
+        return False
     
     def fetch_branches(self, limit: int = 15) -> List[Dict]:
         """
