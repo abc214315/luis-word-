@@ -42,7 +42,7 @@ class BranchDashboardUpdater:
     負責從 GitHub API 獲取分支資訊並更新 README.md
     """
     
-    def __init__(self, token: str, repo_name: str):
+ def __init__(self, token: str, repo_name: str):
         """
         初始化更新器
         
@@ -54,36 +54,36 @@ class BranchDashboardUpdater:
         self.repo_name = repo_name
         self.github = None
         self.repo = None
-        
-   def connect(self) -> bool:
-    """
-    連接到 GitHub API
     
-    Returns:
-        bool: 連接成功返回 True，失敗返回 False
-    """
-    try:
-        logger.info("🔍 正在連接到 GitHub API...")
-        self.github = Github(self.token)
+    def connect(self) -> bool:
+        """
+        連接到 GitHub API
         
-        # 獲取目標倉庫
-        logger.info(f"📦 正在獲取倉庫: {self.repo_name}")
-        self.repo = self.github.get_repo(self.repo_name)
-        logger.info(f"✅ 倉庫已找到: {self.repo.full_name}")
-        
-        # 顯示倉庫基本資訊
-        logger.info(f"   ├─ 星標數: {self.repo.stargazers_count}")
-        logger.info(f"   ├─ Fork 數: {self.repo.forks_count}")
-        logger.info(f"   └─ 開放問題: {self.repo.open_issues_count}")
-        
-        return True
-        
-    except GithubException as e:
-        logger.error(f"❌ GitHub API 錯誤: {e.status} - {e.data.get('message', 'Unknown error')}")
-        return False
-    except Exception as e:
-        logger.error(f"❌ 連接錯誤: {str(e)}")
-        return False
+        Returns:
+            bool: 連接成功返回 True，失敗返回 False
+        """
+        try:
+            logger.info("🔍 正在連接到 GitHub API...")
+            self.github = Github(self.token)
+            
+            # 獲取目標倉庫
+            logger.info(f"📦 正在獲取倉庫: {self.repo_name}")
+            self.repo = self.github.get_repo(self.repo_name)
+            logger.info(f"✅ 倉庫已找到: {self.repo.full_name}")
+            
+            # 顯示倉庫基本資訊
+            logger.info(f"   ├─ 星標數: {self.repo.stargazers_count}")
+            logger.info(f"   ├─ Fork 數: {self.repo.forks_count}")
+            logger.info(f"   └─ 開放問題: {self.repo.open_issues_count}")
+            
+            return True
+            
+        except GithubException as e:
+            logger.error(f"❌ GitHub API 錯誤: {e.status} - {e.data.get('message', 'Unknown error')}")
+            return False
+        except Exception as e:
+            logger.error(f"❌ 連接錯誤: {str(e)}")
+            return False
     
     def fetch_branches(self, limit: int = 15) -> List[Dict]:
         """
