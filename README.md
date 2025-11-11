@@ -1,38 +1,20 @@
-<!-- Header -->
-<div align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=200&section=header&text=Welcome%20to%20My%20GitHub&fontSize=80&fontAlignY=35&animation=twinkling&fontColor=gradient" />
-</div>
+# 路易斯-文字-
 
-<!-- Typing SVG -->
-<h1 align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=600&size=28&duration=4000&pause=1000&color=2E9EF7&center=true&vCenter=true&random=false&width=500&lines=Hi+%F0%9F%91%8B+I'm+abc214315;Full+Stack+Developer+%F0%9F%92%BB;Open+Source+Enthusiast+%F0%9F%8C%9F;Welcome+to+my+GitHub+Profile!" alt="Typing SVG" />
-</h1>
+![Welcome Banner](https://via.placeholder.com/800x200/FF6B6B/FFFFFF?text=Welcome+to+My+GitHub)
 
-<!-- Badges -->
-<p align="center">
-  <img src="https://komarev.com/ghpvc/?username=abc214315&label=Profile%20Views&color=0e75b6&style=for-the-badge" alt="profile views" />
-  <img src="https://img.shields.io/github/followers/abc214315?label=Followers&style=for-the-badge&color=blue&logo=github" alt="followers" />
-  <img src="https://img.shields.io/github/stars/abc214315?label=Stars&style=for-the-badge&color=yellow&logo=github" alt="stars" />
-</p>
-
-<!-- About Me -->
-<div align="center">
-  
-### 👨‍💻 About Me
+## 👋 關於我
 
 ```javascript
 const developer = {
-    name: "abc214315",
-    role: "Full Stack Developer",
-    location: "Taiwan 🇹🇼",
-    code: ["JavaScript", "Python", "TypeScript", "Java", "C++"],
-    technologies: {
-        frontend: ["React", "Vue", "Next.js", "TailwindCSS"],
-        backend: ["Node.js", "Django", "FastAPI", "Spring Boot"],
-        database: ["MySQL", "PostgreSQL", "MongoDB", "Redis"],
-        devOps: ["Docker", "Kubernetes", "AWS", "GitHub Actions"],
-        tools: ["Git", "VS Code", "Postman", "Figma"]
-    },
-    currentFocus: "Building scalable web applications",
-    funFact: "I debug with console.log() 🐛"
+  name: "abc214315",
+  role: "全端開發人員",
+  location: "台灣TW",
+  code: {
+    front: ["Java++", "Python", "TypeScript", "Vue", "Next.js", "TailwindCSS"],
+    backend: ["Node.js", "Django", "FastAPI", "Spring Boot"],
+    database: ["MySQL", "PostgreSQL", "MongoDB", "Redis"]
+  },
+  devOps: ["Docker", "Git", "VS Code", "Postman", "Figma"],
+  currentFocus: "建立可擴充的 Web 應用程式",
+  funFact: "我使用 console.log() 進行偵錯 🐛"
 };
