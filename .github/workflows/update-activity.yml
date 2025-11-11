@@ -1,0 +1,33 @@
+name: 🔥 Update Recent Activity
+
+on:
+  schedule:
+    # 每 30 分鐘執行一次
+    - cron: '*/30 * * * *'
+  
+  # 允許手動觸發
+  workflow_dispatch:
+
+jobs:
+  update-activity:
+    name: 📝 Update Activity
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        
+      - name: 🔄 Update Recent Activity
+        uses: jamesgeorge007/github-activity-readme@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          COMMIT_MSG: '📝 Update recent activity [skip ci]'
+          MAX_LINES: 5
+          
+      - name: ✅ Activity Updated
+        run: |
+          echo "::notice title=Activity Updated::最近活動已更新! 🔥"
