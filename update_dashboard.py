@@ -42,7 +42,7 @@ class BranchDashboardUpdater:
     負責從 GitHub API 獲取分支資訊並更新 README.md
     """
     
- def __init__(self, token: str, repo_name: str):
+    def __init__(self, token: str, repo_name: str):
         """
         初始化更新器
         
@@ -257,13 +257,11 @@ class BranchDashboardUpdater:
             with open(readme_path, 'w', encoding='utf-8') as f:
                 f.write(updated_content)
             
-            logger.info("✅ README 更新成功！")
+            logger.info(f"✅ {readme_path} 更新成功！")
             return True
             
         except Exception as e:
             logger.error(f"❌ 更新 README 時出錯: {str(e)}")
-            import traceback
-            traceback.print_exc()
             return False
     
     @staticmethod
@@ -277,122 +275,98 @@ class BranchDashboardUpdater:
         Returns:
             str: 轉義後的文本
         """
-        # 需要轉義的特殊字符
-        special_chars = {
-            '|': '\\|',
-            '[': '\\[',
-            ']': '\\]',
-            '(': '\\(',
-            ')': '\\)',
-            '<': '&lt;',
-            '>': '&gt;',
-        }
+        # Markdown 特殊字符列表
+        special_chars = ['\\', '`', '*', '_', '{', '}', '[', ']', '(', ')', '#', '+', '-', '.', '!', '|']
         
-        for char, escaped in special_chars.items():
-            text = text.replace(char, escaped)
+        for char in special_chars:
+            text = text.replace(char, '\\' + char)
         
         return text
-
-
-def validate_environment() -> tuple:
-    """
-    驗證環境變數
     
-    Returns:
-        tuple: (token, repo_name) 或 (None, None) 如果驗證失敗
-    """
-    logger.info("🔍 正在驗證環境變數...")
-    
-    token = os.environ.get('GITHUB_TOKEN')
-    repo_name = os.environ.get('REPO_NAME')
-    
-    errors = []
-    
-    if not token:
-        errors.append("GITHUB_TOKEN 環境變數未設置")
-    
-    if not repo_name:
-        errors.append("REPO_NAME 環境變數未設置")
-    elif '/' not in repo_name:
-        errors.append(f"REPO_NAME 格式錯誤: '{repo_name}' (應為 'owner/repo')")
-    
-    if errors:
-        for error in errors:
-            logger.error(f"❌ {error}")
-        return None, None
-    
-    logger.info("✅ 環境變數驗證通過")
-    logger.info(f"   ├─ Token: {'*' * 20}...{token[-4:]}")
-    logger.info(f"   └─ Repo: {repo_name}")
-    
-    return token, repo_name
+    def run(self, limit: int = 15, readme_path: str = 'README.md') -> bool:
+        """
+        執行完整的更新流程
+        
+        Args:
+            limit (int): 最多獲取的分支數量，默認 15
+            readme_path (str): README 文件路徑，默認為 'README.md'
+            
+        Returns:
+            bool: 執行成功返回 True，失敗返回 False
+        """
+        logger.info("=" * 60)
+        logger.info("🚀 開始更新分支儀表板")
+        logger.info("=" * 60)
+        
+        # 1. 連接到 GitHub
+        if not self.connect():
+            logger.error("❌ 無法連接到 GitHub，更新失敗")
+            return False
+        
+        # 2. 獲取分支資訊
+        branches = self.fetch_branches(limit)
+        if not branches:
+            logger.error("❌ 沒有獲取到分支資訊，更新失敗")
+            return False
+        
+        # 3. 生成表格
+        table_content = self.generate_table(branches)
+        
+        # 4. 更新 README
+        success = self.update_readme(table_content, readme_path)
+        
+        # 5. 顯示結果
+        logger.info("=" * 60)
+        if success:
+            logger.info("✅ 儀表板更新完成！")
+        else:
+            logger.info("ℹ️  儀表板無需更新")
+        logger.info("=" * 60)
+        
+        return success
 
 
 def main():
     """
     主函數
-    
-    執行流程:
-    1. 驗證環境變數
-    2. 連接到 GitHub API
-    3. 獲取分支資訊
-    4. 生成 Markdown 表格
-    5. 更新 README 文件
     """
-    logger.info("=" * 60)
-    logger.info("🚀 GitHub Branch Dashboard Updater")
-    logger.info("=" * 60)
+    # 從環境變數獲取配置
+    github_token = os.getenv('GITHUB_TOKEN')
+    repo_name = os.getenv('GITHUB_REPOSITORY')
     
+    # 驗證必要的環境變數
+    if not github_token:
+        logger.error("❌ 錯誤: 未設置 GITHUB_TOKEN 環境變數")
+        logger.info("💡 請在 GitHub Secrets 中添加 GITHUB_TOKEN")
+        sys.exit(1)
+    
+    if not repo_name:
+        logger.error("❌ 錯誤: 未設置 GITHUB_REPOSITORY 環境變數")
+        logger.info("💡 這通常由 GitHub Actions 自動設置")
+        sys.exit(1)
+    
+    # 創建更新器實例
+    updater = BranchDashboardUpdater(github_token, repo_name)
+    
+    # 執行更新
     try:
-        # 步驟 1: 驗證環境變數
-        token, repo_name = validate_environment()
-        if not token or not repo_name:
-            logger.error("💥 環境變數驗證失敗，程式退出")
-            sys.exit(1)
+        success = updater.run(limit=15, readme_path='README.md')
         
-        # 步驟 2: 創建更新器並連接
-        logger.info("\n" + "─" * 60)
-        updater = BranchDashboardUpdater(token, repo_name)
-        
-        if not updater.connect():
-            logger.error("💥 連接 GitHub API 失敗，程式退出")
-            sys.exit(1)
-        
-        # 步驟 3: 獲取分支資訊
-        logger.info("\n" + "─" * 60)
-        branches = updater.fetch_branches(limit=15)
-        
-        if not branches:
-            logger.warning("⚠️  沒有獲取到分支資訊")
-            logger.info("💡 請確認倉庫中至少有一個分支")
-            sys.exit(1)
-        
-        # 步驟 4: 生成表格
-        logger.info("\n" + "─" * 60)
-        table_content = updater.generate_table(branches)
-        
-        # 步驟 5: 更新 README
-        logger.info("\n" + "─" * 60)
-        if updater.update_readme(table_content):
-            logger.info("\n" + "=" * 60)
-            logger.info("🎉 儀表板更新完成！")
-            logger.info("=" * 60)
-            sys.exit(0)
+        # 根據結果設置退出碼
+        if success:
+            sys.exit(0)  # 成功
         else:
-            logger.info("\n" + "=" * 60)
-            logger.info("ℹ️  沒有需要更新的內容")
-            logger.info("=" * 60)
-            sys.exit(0)
-        
+            sys.exit(0)  # 無變更也視為成功（不觸發錯誤）
+            
     except KeyboardInterrupt:
-        logger.info("\n⚠️  操作被用戶中斷")
+        logger.warning("\n⚠️  用戶中斷執行")
         sys.exit(1)
     except Exception as e:
-        logger.error(f"\n💥 發生未預期的錯誤: {str(e)}")
+        logger.error(f"❌ 執行過程中發生未預期的錯誤: {str(e)}")
         import traceback
-        traceback.print_exc()
+        logger.error(traceback.format_exc())
         sys.exit(1)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
